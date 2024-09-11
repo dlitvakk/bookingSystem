@@ -1,5 +1,4 @@
 #include <iostream>
-#include <utility>
 using namespace std;
 
 class Seat {
@@ -12,6 +11,26 @@ public:
         : place(a),
           isBooked(b),
           price(c) {
+    }
+// const does not change the state of the object in the function
+    string getSeatPlace() const {
+        return &place;
+    }
+
+    float getPrice() const {
+        return price;
+    }
+
+    bool isAvailable() const {
+        return isBooked;
+    }
+
+    void book() {
+        isBooked = false;
+    }
+
+    void unbook() {
+        isBooked = true;
     }
 };
 
@@ -44,7 +63,7 @@ class Ticket {
     string seat;
     string flightInfo;
     bool isBooked;
-    
+
 public:
     Ticket(string a, string b, string c, bool d)
         : passengerName(move(a)),
@@ -53,6 +72,12 @@ public:
           isBooked(d) {
     }
 };
+
+class ConfigReader {
+    string filename;
+    vector<Airplane> airplanes;
+    vector<Ticket> tickets;
+}
 
 int main() {
     cout << "Hello, World!" << endl;
