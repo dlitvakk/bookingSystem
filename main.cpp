@@ -1,4 +1,5 @@
 #include <iostream>
+#include <utility>
 using namespace std;
 
 class Seat {
@@ -39,6 +40,18 @@ public:
 };
 
 class Ticket {
+    string passengerName;
+    string seat;
+    string flightInfo;
+    bool isBooked;
+    
+public:
+    Ticket(string a, string b, string c, bool d)
+        : passengerName(move(a)),
+          seat(move(b)),
+          flightInfo(move(c)),
+          isBooked(d) {
+    }
 };
 
 int main() {
