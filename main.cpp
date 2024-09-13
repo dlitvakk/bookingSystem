@@ -1,6 +1,7 @@
 #include <fstream>
 #include <iostream>
 #include <map>
+#include <sstream>
 using namespace std;
 
 class Seat {
@@ -180,8 +181,7 @@ public:
         cout << "Passenger: " << passengerName
              << "\nFlight Info: " << flightInfo
              << "\nSeat: " << seat
-             << "\nPrice: " << price << "$"
-             << "\nBooking Status: " << (isBooked ? "Booked" : "Not Booked") << endl;
+             << "\nPrice: " << price << "$" << endl;
     }
 };
 
@@ -319,6 +319,7 @@ public:
                 }
                 return;
             }
+            cout << "Flight not found." << endl;
         }
     }
 
@@ -349,17 +350,27 @@ public:
         }
     }
 
-    void view(const string& id) {
+    void view(const string& arg) {
         // View the booking confirmation info by id
         // return flight number, date, seat number, tickets price
 
-        map<string, Ticket>::iterator it = tickets.find(id);
-        if (it != tickets.end()) {
-            // Access the ticket through the iterator
+        if (const auto it = tickets.find(arg); it != tickets.end()) {
             const Ticket& ticket = it->second;
             ticket.displayTicket();
-        } else {
-            cout << "Ticket not found." << endl;
+            return;
+        }
+
+        cout << "Tickets for " << arg << ":\n";
+        bool found = false;
+        for (const auto& [id, ticket] : tickets) {
+            if (ticket.getPassengerName() == arg) {
+                cout << "Ticket ID: " << id << " Flight: " << ticket.getFlightInfo() << " Seat: " << ticket.getSeat() << endl;
+                found = true;
+            }
+        }
+
+        if (!found) {
+            cout << "No tickets found for " << arg << "." << endl;
         }
     }
     void viewUser(const string& passengerName) {
@@ -374,7 +385,7 @@ public:
         }
     }
 
-    void view(string flightNumber, string date) {
+    void view(const string &flightNumber, const string &date) {
         // view all booked tickets for a particular flight by flight number and date
         // return seat, passenger name, price for a chosen flight
         cout << "Tickets for flight " << flightNumber << " on " << date << ":\n";
@@ -391,7 +402,7 @@ int main() {
     configReader.readConfig();
 
     Airbnb airbnb(configReader.getAirplanes());
-
+/*
     string ticketID = airbnb.bookSeat("FQ12", "2B", "11.12.2022", "AdamSmith");
     string ticketID2 = airbnb.bookSeat("FQ12", "1F", "11.12.2022", "DanaLitvak");
     airbnb.view(ticketID);
@@ -404,8 +415,43 @@ int main() {
     airbnb.checkAvailability("11.12.2022", "FQ12");
     airbnb.viewUser("AdamSmith");
     airbnb.view("HJ114", "11.12.2022");
+*/
+    string input;
+    cout << "Welcome to the booking system! Type 'help' for a list of commands." << endl;
+    while (true) {
+        cout << "> ";
+        getline(cin, input);
 
-    
+        if (input == "help") {
+            cout << "Commands:\n"
+                 << "book <flight number> <seat number> <date> <passenger name>\n"
+                 << "check <date> <flight number>\n"
+                 << "return <ticket ID>\n"
+                 << "view <ticket ID>\n"
+                 << "view <passenger name>\n"
+                 << "view <flight number> <date>\n"
+                 << "exit\n";
+        } else if (input == "exit") {
+            break;
+        } else {
+            string command;
+            string arg1, arg2, arg3, arg4;
+            istringstream iss(input);
+            iss >> command >> arg1 >> arg2 >> arg3 >> arg4;
+
+            if (command == "book") {
+                airbnb.bookSeat(arg1, arg2, arg3, arg4);
+            } else if (command == "check") {
+                airbnb.checkAvailability(arg1, arg2);
+            } else if (command == "return") {
+                airbnb.returnTicket(arg1);
+            } else if (command == "view" && arg2.empty()) {
+                airbnb.view(arg1);
+            } else if (command == "view") {
+                airbnb.view(arg1, arg2);
+            }
+        }
+    }
 
     return 0;
 }
